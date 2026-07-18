@@ -1,18 +1,5 @@
 import StatusBadge from "./StatusBadge";
-
-export type Build = {
-  id: number;
-  provider: "GitHub" | "GitLab" | "Jenkins";
-  workflow: string;
-  branch: string;
-  status: "success" | "failed" | "running";
-  duration: string;
-  triggeredBy: string;
-};
-
-type BuildTableProps = {
-  builds: Build[];
-};
+import type { BuildTableProps } from "../types/build";
 
 const BuildTable = ({ builds }: BuildTableProps) => {
   return (

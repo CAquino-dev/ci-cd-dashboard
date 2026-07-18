@@ -5,41 +5,45 @@ import {
   XCircle,
 } from "lucide-react";
 
+import { useState, useEffect } from "react";
+
 import Navbar from "../components/Navbar";
 import StatCard from "../components/StatCard";
-import BuildTable, { type Build } from "../components/BuildTable";
+import BuildTable from "../components/BuildTable";
+import type { Build } from "../types/build";
+import { getBuilds } from "../services/buildService";
 
-const mockBuilds: Build[] = [
-  {
-    id: 1,
-    provider: "GitHub",
-    workflow: "Deploy Frontend",
-    branch: "main",
-    status: "success",
-    duration: "2m 13s",
-    triggeredBy: "Christian",
-  },
-  {
-    id: 2,
-    provider: "Jenkins",
-    workflow: "Backend Tests",
-    branch: "development",
-    status: "failed",
-    duration: "4m 01s",
-    triggeredBy: "Jenkins Bot",
-  },
-  {
-    id: 3,
-    provider: "GitLab",
-    workflow: "Docker Build",
-    branch: "feature/auth",
-    status: "running",
-    duration: "Running",
-    triggeredBy: "GitLab Runner",
-  },
-];
 
 const Dashboard = () => {
+  const [builds, setBuilds] = useState<Build[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchBuilds = async () => {
+      try {
+        setLoading(true);
+
+        const data = await getBuilds();
+        setBuilds(data);
+      } 
+      catch (error) {
+        console.error("Error fetching builds:", error);
+        setError("Failed to fetch builds.");
+      }
+      finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBuilds();
+  }, []);
+
+  useEffect( () => {
+    console.log("Builds state updated:", builds);
+  }, [])
+
+
   return (
     <>
       <Navbar />
@@ -83,7 +87,7 @@ const Dashboard = () => {
           />
         </section>
 
-        <BuildTable builds={mockBuilds} />
+        <BuildTable builds={builds} />
       </main>
     </>
   );
