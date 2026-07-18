@@ -1,53 +1,92 @@
-import { useState, useEffect } from 'react'
-import { getHealth } from '../services/api'
+import {
+  CheckCircle2,
+  Clock3,
+  Timer,
+  XCircle,
+} from "lucide-react";
 
-type HealthResponse =  {
-    status: string; 
-    service: string;
-    version: string;
-}
+import Navbar from "../components/Navbar";
+import StatCard from "../components/StatCard";
+import BuildTable, { type Build } from "../components/BuildTable";
 
-const dashboard = () => {
-    const [health, setHealth] = useState<HealthResponse | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+const mockBuilds: Build[] = [
+  {
+    id: 1,
+    provider: "GitHub",
+    workflow: "Deploy Frontend",
+    branch: "main",
+    status: "success",
+    duration: "2m 13s",
+    triggeredBy: "Christian",
+  },
+  {
+    id: 2,
+    provider: "Jenkins",
+    workflow: "Backend Tests",
+    branch: "development",
+    status: "failed",
+    duration: "4m 01s",
+    triggeredBy: "Jenkins Bot",
+  },
+  {
+    id: 3,
+    provider: "GitLab",
+    workflow: "Docker Build",
+    branch: "feature/auth",
+    status: "running",
+    duration: "Running",
+    triggeredBy: "GitLab Runner",
+  },
+];
 
-    useEffect(() => {
-        async function fetchHealth() {
-            try {
-                const data = await getHealth();
-                setHealth(data);
-                setLoading(false);
-            } catch (err) {
-                setError("Failed to fetch health data");
-                setLoading(false);
-            } finally {
-                setLoading(false);
-            }
-        }
-        fetchHealth();
-    }, [])
-
-    useEffect(() => {
-
-        console.log(health)
-
-    }, [health])
-
-
-  if (loading) return <h2>Loading...</h2>;
-
-  if (error) return <h2>{error}</h2>;
-
+const Dashboard = () => {
   return (
-    <div>
-        <h1>Dashboard</h1>
-        <p>Backend Status</p>
-        <p>Status: {health?.status}</p>
-        <p>Service: {health?.service}</p>
-        <p>Version: {health?.version}</p>
-    </div>
-  )
-}
+    <>
+      <Navbar />
 
-export default dashboard
+      <main className="mx-auto min-h-screen max-w-7xl bg-slate-950 p-6">
+        <h2 className="text-3xl font-semibold text-slate-100">
+          Dashboard
+        </h2>
+
+        <p className="mt-2 text-slate-400">
+          Welcome to your CI/CD monitoring dashboard.
+        </p>
+
+        <section className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+          <StatCard
+            title="Successful Builds"
+            value={128}
+            icon={CheckCircle2}
+            iconColor="text-emerald-400"
+          />
+
+          <StatCard
+            title="Failed Builds"
+            value={6}
+            icon={XCircle}
+            iconColor="text-red-400"
+          />
+
+          <StatCard
+            title="Running Builds"
+            value={3}
+            icon={Clock3}
+            iconColor="text-yellow-400"
+          />
+
+          <StatCard
+            title="Average Build Time"
+            value="2m 18s"
+            icon={Timer}
+            iconColor="text-sky-400"
+          />
+        </section>
+
+        <BuildTable builds={mockBuilds} />
+      </main>
+    </>
+  );
+};
+
+export default Dashboard;
