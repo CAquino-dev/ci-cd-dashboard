@@ -66,6 +66,7 @@ const Dashboard = () => {
           <StatCard
             title="Successful Builds"
             value={stats.successfulBuilds}
+            subtitle="+12 this week"
             icon={CheckCircle2}
             iconColor="text-emerald-400"
           />
@@ -73,6 +74,7 @@ const Dashboard = () => {
           <StatCard
             title="Failed Builds"
             value={stats.failedBuilds}
+            subtitle="Needs attention"
             icon={XCircle}
             iconColor="text-red-400"
           />
@@ -80,6 +82,7 @@ const Dashboard = () => {
           <StatCard
             title="Running Builds"
             value={stats.runningBuilds}
+            subtitle="Currently executing"
             icon={Clock3}
             iconColor="text-yellow-400"
           />
@@ -87,6 +90,7 @@ const Dashboard = () => {
           <StatCard
             title="Average Build Time"
             value={stats.averageBuildTime}
+            subtitle="Last 50 builds"
             icon={Timer}
             iconColor="text-sky-400"
           />
