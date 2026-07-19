@@ -34,19 +34,19 @@ function formatDuration(totalSeconds: number): string {
 
 export function calculateBuildStats(builds: Build[]): DashboardStats {
   const successfulBuilds = builds.filter(
-    (build) => build.status === "success"
+    (build) => build.status === "Success"
   ).length;
 
   const failedBuilds = builds.filter(
-    (build) => build.status === "failed"
+    (build) => build.status === "Failed"
   ).length;
 
   const runningBuilds = builds.filter(
-    (build) => build.status === "running"
+    (build) => build.status === "Running"
   ).length;
 
   const completedBuilds = builds.filter(
-    (build) => build.status !== "running"
+    (build) => build.status !== "Running"
   );
 
   const totalSeconds = completedBuilds.reduce(

@@ -34,7 +34,7 @@ type BuildTableProps = {
 
 const BuildTable = ({ builds }: BuildTableProps) => {
   const [search, setSearch] = useState("");
-  const [selectedBuild, setSelectedBuild] = useState<Build | null>(null);
+const [selectedBuildId, setSelectedBuildId] = useState<number | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const [providerFilter, setProviderFilter] = useState<
@@ -205,7 +205,7 @@ const BuildTable = ({ builds }: BuildTableProps) => {
               <TableRow
                 key={build.id}
                   onClick={() => {
-                  setSelectedBuild(build);
+                  setSelectedBuildId(build.id);
                   setDialogOpen(true);
                 }}  
                 className="cursor-pointer border-slate-800 transition-colors hover:bg-slate-800/40"
@@ -237,7 +237,7 @@ const BuildTable = ({ builds }: BuildTableProps) => {
       </Table>
 
       <BuildDetailsDialog
-        build={selectedBuild}
+        buildId={selectedBuildId}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
       />

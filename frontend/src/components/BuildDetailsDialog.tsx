@@ -1,4 +1,7 @@
+import { useEffect, useState } from "react";
+
 import type { Build } from "@/types/build";
+import { getBuildById } from "@/services/buildService";
 
 import {
   Dialog,
@@ -28,17 +31,70 @@ import {
 } from "lucide-react";
 
 type BuildDetailsDialogProps = {
-  build: Build | null;
+  buildId: number | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 };
 
 const BuildDetailsDialog = ({
-  build,
+  buildId,
   open,
   onOpenChange,
 }: BuildDetailsDialogProps) => {
-  if (!build) return null;
+if (buildId === null) return null;  
+
+    const [build, setBuild] = useState<Build | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+  if (!open || buildId === null) return;
+
+  const fetchBuild = async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const data = await getBuildById(buildId);
+      setBuild(data);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to load build details.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchBuild();
+}, [open, buildId]);
+
+if (loading) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-4xl">
+        <div className="flex h-48 items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+if (error) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-4xl">
+        <div className="flex h-48 items-center justify-center text-red-400">
+          {error}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+if (!build) {
+  return null;
+}
 
   const getStatusIcon = (status: Build["status"]) => {
     switch (status) {
