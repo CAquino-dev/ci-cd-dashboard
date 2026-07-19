@@ -15,11 +15,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 import { Badge } from "@/components/ui/badge";
-
 import { Input } from "@/components/ui/input";
-
 import {
   Select,
   SelectContent,
@@ -27,8 +24,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
 import type { Build } from "@/types/build";
+
+import BuildDetailsDialog from "./BuildDetailsDialog";
 
 type BuildTableProps = {
   builds: Build[];
@@ -36,6 +34,8 @@ type BuildTableProps = {
 
 const BuildTable = ({ builds }: BuildTableProps) => {
   const [search, setSearch] = useState("");
+  const [selectedBuild, setSelectedBuild] = useState<Build | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const [providerFilter, setProviderFilter] = useState<
     Build["provider"] | "All"
@@ -204,6 +204,10 @@ const BuildTable = ({ builds }: BuildTableProps) => {
             filteredBuilds.map((build) => (
               <TableRow
                 key={build.id}
+                  onClick={() => {
+                  setSelectedBuild(build);
+                  setDialogOpen(true);
+                }}  
                 className="cursor-pointer border-slate-800 transition-colors hover:bg-slate-800/40"
               >
                 <TableCell className="font-medium text-slate-200">
@@ -231,6 +235,12 @@ const BuildTable = ({ builds }: BuildTableProps) => {
           )}
         </TableBody>
       </Table>
+
+      <BuildDetailsDialog
+        build={selectedBuild}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
     </section>
   );
 };
