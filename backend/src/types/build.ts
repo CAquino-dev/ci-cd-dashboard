@@ -2,12 +2,26 @@ export type BuildStatus = "success" | "failed" | "running";
 
 export type BuildProvider = "GitHub" | "GitLab" | "Jenkins";
 
-export interface Build {
+export type Build = {
   id: number;
-  provider: BuildProvider;
+
+  provider: "GitHub" | "GitLab" | "Jenkins";
+
   workflow: string;
+
   branch: string;
-  status: BuildStatus;
+
+  status: "Success" | "Failed" | "Running";
+
   duration: string;
+
   triggeredBy: string;
-}
+
+  commitSha: string;
+
+  startedAt: string;
+
+  finishedAt: string;
+
+  logs: string[];
+};

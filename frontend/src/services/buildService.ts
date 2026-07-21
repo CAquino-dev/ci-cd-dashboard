@@ -6,3 +6,13 @@ export const getBuilds = async (): Promise<Build[]> => {
     console.log(response.data);
     return response.data;
 }
+
+export const getBuildById = async (id: number): Promise<Build | null> => {
+    try {
+        const response = await api.get(`/builds/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error(`Error fetching build with ID ${id}:`, error);
+        return null;
+    }
+}
