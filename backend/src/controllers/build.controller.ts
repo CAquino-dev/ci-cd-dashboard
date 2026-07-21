@@ -16,17 +16,23 @@ export const getAllBuilds = async (
     }
 }
 
-export const getBuildById = (
+export const getBuildById = async (
     req: Request,
     res: Response
 ) => {
-    const id = Number(req.params.id);
-    const build = getBuildbyId(id);
+    try {
+        const id = Number(req.params.id);
+        const build = await getBuildbyId(id);
 
-    if (build) {
-        res.json(build);
-    } else {
-        res.status(404).json({ message: "Build not found" });
+        if (build) {
+            res.json(build);
+        } else {
+            res.status(404).json({ message: "Build not found" });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: "Failed to fetch build",
+        });
     }
-}   
-
+}
