@@ -8,11 +8,6 @@ type DashboardStats = {
 };
 
 function parseDuration(duration: string): number {
-  // Ignore running builds
-  if (duration.toLowerCase() === "running") {
-    return 0;
-  }
-
   const match = duration.match(/(\d+)m\s*(\d+)s/);
 
   if (!match) {
@@ -32,7 +27,9 @@ function formatDuration(totalSeconds: number): string {
   return `${minutes}m ${seconds}s`;
 }
 
-export function calculateBuildStats(builds: Build[]): DashboardStats {
+export function calculateBuildStats(
+  builds: Build[]
+): DashboardStats {
   const successfulBuilds = builds.filter(
     (build) => build.status === "Success"
   ).length;
