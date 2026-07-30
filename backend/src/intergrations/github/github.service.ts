@@ -36,5 +36,25 @@ export const getWorkflowRun = async (runId: number) => {
   return response.data;
 };
 
+const github = axios.create({
+  baseURL: "https://api.github.com",
+  headers: {
+    Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+    Accept: "application/vnd.github+json",
+  },
+});
+
+
+export const getUserRepositories = async () => {
+  const response = await github.get("/user/repos", {
+    params:{
+      sort: "updated",
+      per_page: 100,
+    },
+  });
+
+  return response.data;
+};
+
 
 

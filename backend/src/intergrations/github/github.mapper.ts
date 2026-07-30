@@ -35,3 +35,13 @@ export const mapWorkflowRunToBuild = (run: any): Build => {
     logs: [],
   };
 };
+
+export const mapRepository = (repo: any) => ({
+  id: repo.id,
+  owner: repo.owner.login,
+  name: repo.name,
+  fullName: repo.full_name,
+  private: repo.private,
+  defaultBranch: repo.default_branch,
+  provider: "GitHub",
+});
