@@ -6,3 +6,4 @@ export const getRepositories = async () => {
 
     return repositories.map(mapRepository);
 };
+
