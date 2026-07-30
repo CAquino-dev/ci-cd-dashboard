@@ -4,50 +4,87 @@ import {
   Timer,
   XCircle,
 } from "lucide-react";
-
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import Navbar from "../components/Navbar";
 import StatCard from "../components/StatCard";
 import BuildTable from "../components/BuildTable";
-import type { Build } from "../types/build";
-import { getBuilds } from "../services/buildService";
-import { calculateBuildStats } from "../utils/buildStats";
+import RepositorySelector from "../components/RepositorySelector";
 import Loading from "../components/Loading";
 import ErrorMessage from "../components/ErrorMessage";
 
+import type { Build } from "../types/build";
+import type { Repository } from "../types/repository";
+
+import { getBuilds } from "../services/buildService";
+import { getRepositories } from "../services/repositoryService";
+import { calculateBuildStats } from "../utils/buildStats";
 
 const Dashboard = () => {
+  const [repositories, setRepositories] = useState<Repository[]>([]);
+  const [selectedRepository, setSelectedRepository] =
+    useState<Repository | null>(null);
+
   const [builds, setBuilds] = useState<Build[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState<boolean>(true);
+
   const stats = calculateBuildStats(builds);
 
+  /**
+   * Load repositories on page load
+   */
   useEffect(() => {
+    const fetchRepositories = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const data = await getRepositories();
+
+        setRepositories(data);
+
+        if (data.length > 0) {
+          setSelectedRepository(data[0]);
+        }
+      } catch (error) {
+        console.error(error);
+        setError("Failed to fetch repositories.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRepositories();
+  }, []);
+
+  /**
+   * Load builds whenever the selected repository changes
+   */
+  useEffect(() => {
+    if (!selectedRepository) return;
+
     const fetchBuilds = async () => {
       try {
         setLoading(true);
         setError("");
 
-        const data = await getBuilds();
+        const data = await getBuilds(
+          selectedRepository.owner,
+          selectedRepository.name
+        );
+
         setBuilds(data);
-      } 
-      catch (error) {
-        console.error("Error fetching builds:", error);
+      } catch (error) {
+        console.error(error);
         setError("Failed to fetch builds.");
-      }
-      finally {
+      } finally {
         setLoading(false);
       }
     };
 
     fetchBuilds();
-  }, []);
-
-  useEffect( () => {
-    console.log("Builds state updated:", builds);
-  }, [])
-
+  }, [selectedRepository]);
 
   return (
     <>
@@ -61,6 +98,14 @@ const Dashboard = () => {
         <p className="mt-2 text-slate-400">
           Welcome to your CI/CD monitoring dashboard.
         </p>
+
+        <div className="mt-6">
+          <RepositorySelector
+            repositories={repositories}
+            selectedRepository={selectedRepository}
+            onRepositoryChange={setSelectedRepository}
+          />
+        </div>
 
         <section className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           <StatCard
@@ -97,12 +142,15 @@ const Dashboard = () => {
         </section>
 
         {loading ? (
-            <Loading />
-          ) : error ? (
-            <ErrorMessage message={error} />
-          ) : (
-            <BuildTable builds={builds} />
-          )}
+          <Loading />
+        ) : error ? (
+          <ErrorMessage message={error} />
+        ) : (
+          <BuildTable
+            builds={builds}
+            repository={selectedRepository}
+          />
+        )}
       </main>
     </>
   );

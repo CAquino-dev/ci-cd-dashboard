@@ -1,11 +1,5 @@
 import { useMemo, useState } from "react";
-import {
-  CheckCircle2,
-  Clock3,
-  GitBranch,
-  Search,
-  XCircle,
-} from "lucide-react";
+import { CheckCircle2, Clock3, GitBranch, Search, XCircle } from "lucide-react";
 
 import {
   Table,
@@ -27,23 +21,25 @@ import {
 import type { Build } from "@/types/build";
 
 import BuildDetailsDialog from "./BuildDetailsDialog";
+import type { Repository } from "@/types/repository";
 
 type BuildTableProps = {
   builds: Build[];
+  repository: Repository | null;
 };
 
-const BuildTable = ({ builds }: BuildTableProps) => {
+const BuildTable = ({ builds, repository }: BuildTableProps) => {
   const [search, setSearch] = useState("");
-const [selectedBuildId, setSelectedBuildId] = useState<number | null>(null);
+  const [selectedBuildId, setSelectedBuildId] = useState<number | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const [providerFilter, setProviderFilter] = useState<
     Build["provider"] | "All"
   >("All");
 
-  const [statusFilter, setStatusFilter] = useState<
-    Build["status"] | "All"
-  >("All");
+  const [statusFilter, setStatusFilter] = useState<Build["status"] | "All">(
+    "All",
+  );
 
   const filteredBuilds = useMemo(() => {
     return builds.filter((build) => {
@@ -53,12 +49,10 @@ const [selectedBuildId, setSelectedBuildId] = useState<number | null>(null);
         build.triggeredBy.toLowerCase().includes(search.toLowerCase());
 
       const matchesProvider =
-        providerFilter === "All" ||
-        build.provider === providerFilter;
+        providerFilter === "All" || build.provider === providerFilter;
 
       const matchesStatus =
-        statusFilter === "All" ||
-        build.status === statusFilter;
+        statusFilter === "All" || build.status === statusFilter;
 
       return matchesSearch && matchesProvider && matchesStatus;
     });
@@ -99,11 +93,9 @@ const [selectedBuildId, setSelectedBuildId] = useState<number | null>(null);
     <section className="mt-10 overflow-hidden rounded-xl border border-slate-800 bg-slate-900">
       {/* Header */}
       <div className="border-b border-slate-800 px-6 py-4">
-        <h3 className="text-lg font-semibold text-slate-100">
-          Build History
-        </h3>
+        <h3 className="text-lg font-semibold text-slate-100">Build History</h3>
 
-        <p className="text-sm text-slate-400">  
+        <p className="text-sm text-slate-400">
           Recent CI/CD pipeline executions
         </p>
       </div>
@@ -169,10 +161,7 @@ const [selectedBuildId, setSelectedBuildId] = useState<number | null>(null);
           <span className="font-medium text-slate-100">
             {filteredBuilds.length}
           </span>{" "}
-          of{" "}
-          <span className="font-medium text-slate-100">
-            {builds.length}
-          </span>{" "}
+          of <span className="font-medium text-slate-100">{builds.length}</span>{" "}
           builds
         </p>
       </div>
@@ -181,12 +170,24 @@ const [selectedBuildId, setSelectedBuildId] = useState<number | null>(null);
       <Table>
         <TableHeader>
           <TableRow className="border-slate-800 hover:bg-transparent">
-            <TableHead className="text-slate-300 font-semibold">Provider</TableHead>
-            <TableHead className="text-slate-300 font-semibold">Workflow</TableHead>
-            <TableHead className="text-slate-300 font-semibold">Branch</TableHead>
-            <TableHead className="text-slate-300 font-semibold">Status</TableHead>
-            <TableHead className="text-slate-300 font-semibold">Duration</TableHead>
-            <TableHead className="text-slate-300 font-semibold">Triggered By</TableHead>
+            <TableHead className="text-slate-300 font-semibold">
+              Provider
+            </TableHead>
+            <TableHead className="text-slate-300 font-semibold">
+              Workflow
+            </TableHead>
+            <TableHead className="text-slate-300 font-semibold">
+              Branch
+            </TableHead>
+            <TableHead className="text-slate-300 font-semibold">
+              Status
+            </TableHead>
+            <TableHead className="text-slate-300 font-semibold">
+              Duration
+            </TableHead>
+            <TableHead className="text-slate-300 font-semibold">
+              Triggered By
+            </TableHead>
           </TableRow>
         </TableHeader>
 
@@ -204,17 +205,19 @@ const [selectedBuildId, setSelectedBuildId] = useState<number | null>(null);
             filteredBuilds.map((build) => (
               <TableRow
                 key={build.id}
-                  onClick={() => {
+                onClick={() => {
                   setSelectedBuildId(build.id);
                   setDialogOpen(true);
-                }}  
+                }}
                 className="cursor-pointer border-slate-800 transition-colors hover:bg-slate-800/40"
               >
                 <TableCell className="font-medium text-slate-200">
                   {build.provider}
                 </TableCell>
 
-                <TableCell className="text-slate-300">{build.workflow}</TableCell>
+                <TableCell className="text-slate-300">
+                  {build.workflow}
+                </TableCell>
 
                 <TableCell>
                   <div className="flex items-center gap-2 text-slate-300">
@@ -223,13 +226,15 @@ const [selectedBuildId, setSelectedBuildId] = useState<number | null>(null);
                   </div>
                 </TableCell>
 
-                <TableCell>
-                  {getStatusBadge(build.status)}
+                <TableCell>{getStatusBadge(build.status)}</TableCell>
+
+                <TableCell className="text-slate-300">
+                  {build.duration}
                 </TableCell>
 
-                <TableCell className="text-slate-300">{build.duration}</TableCell>
-
-                <TableCell className="text-slate-300">{build.triggeredBy}</TableCell>
+                <TableCell className="text-slate-300">
+                  {build.triggeredBy}
+                </TableCell>
               </TableRow>
             ))
           )}
@@ -238,6 +243,7 @@ const [selectedBuildId, setSelectedBuildId] = useState<number | null>(null);
 
       <BuildDetailsDialog
         buildId={selectedBuildId}
+        repository={repository}
         open={dialogOpen}
         onOpenChange={setDialogOpen}
       />

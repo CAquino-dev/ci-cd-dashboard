@@ -1,18 +1,30 @@
 import api from "../lib/api";
 import type { Build } from "../types/build";
 
-export const getBuilds = async (): Promise<Build[]> => {
-    const response = await api.get("/builds");
-    console.log(response.data);
-    return response.data;
-}
+export const getBuilds = async (
+  owner: string,
+  repo: string
+): Promise<Build[]> => {
+  const response = await api.get(
+    `/repositories/${owner}/${repo}/builds`
+  );
 
-export const getBuildById = async (id: number): Promise<Build | null> => {
-    try {
-        const response = await api.get(`/builds/${id}`);
-        return response.data;
-    } catch (error) {
-        console.error(`Error fetching build with ID ${id}:`, error);
-        return null;
-    }
-}
+  return response.data;
+};
+
+export const getBuildById = async (
+  owner: string,
+  repo: string,
+  runId: number
+): Promise<Build | null> => {
+  try {
+    const response = await api.get(
+      `/repositories/${owner}/${repo}/builds/${runId}`
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
