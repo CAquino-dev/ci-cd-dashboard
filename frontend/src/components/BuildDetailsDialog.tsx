@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-
+import type { Repository } from "@/types/repository";
 import type { Build } from "@/types/build";
 import { getBuildById } from "@/services/buildService";
 
@@ -32,12 +32,14 @@ import {
 
 type BuildDetailsDialogProps = {
   buildId: number | null;
+  repository: Repository | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 };
 
 const BuildDetailsDialog = ({
   buildId,
+  repository,
   open,
   onOpenChange,
 }: BuildDetailsDialogProps) => {
@@ -47,15 +49,23 @@ if (buildId === null) return null;
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    useEffect(() => {
-  if (!open || buildId === null) return;
+useEffect(() => {
+  if (!open || !buildId || !repository) return;
 
   const fetchBuild = async () => {
     try {
       setLoading(true);
       setError("");
 
-      const data = await getBuildById(buildId);
+      console.log(repository);
+      console.log(buildId);
+
+      const data = await getBuildById(
+        repository.owner,
+        repository.name,
+        buildId
+      );
+
       setBuild(data);
     } catch (err) {
       console.error(err);
@@ -66,7 +76,7 @@ if (buildId === null) return null;
   };
 
   fetchBuild();
-}, [open, buildId]);
+}, [open, buildId, repository]);
 
 if (loading) {
   return (
